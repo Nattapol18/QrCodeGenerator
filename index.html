@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <link rel="stylesheet" href="qrcode.css"/>
+</head>
+<body>
+    <div class="nav-buttons">
+        <button class="nav-button active" onclick="showPage('main')">URL QR</button>
+        <button class="nav-button" onclick="showPage('stores')">App & Play Store</button>
+    </div>
+    <!-- Main Page -->
+    <div id="mainPage" class="page active">
+        <h1>Generate QR Code from URL</h1>
+        <p>Enter a URL below to generate a QR Code:</p>
+        <input type="text" id="urlInput" placeholder="Enter your URL here" />
+        <button onclick="generateMainQRCode()">Generate QR Code</button>
+        <div id="qrCode"></div>
+        <button id="downloadMainQR" style="display: none;" onclick="downloadQRCode('qrCode', 'main_qr_code.png')">Download QR Code</button>
+    </div>
+    <!-- App Store & Play Store Page -->
+    <div id="storesPage" class="page">
+        <h1>App & Play Store QR Codes</h1>
+        <p>Enter both App Store and Play Store URLs:</p>
+        <input type="text" id="appStoreInput" placeholder="Enter App Store URL" />
+        <input type="text" id="playStoreInput" placeholder="Enter Play Store URL" />
+        <button onclick="generateStoreQRCodes()">Generate QR Codes</button>
+        <div class="qr-container">
+            <div>
+                <div id="appStoreQR" class="qr-code"></div>
+                <button id="downloadAppStoreQR" style="display: none;" onclick="downloadQRCode('appStoreQR', 'app_store_qr_code.png')">Download App Store QR</button>
+            </div>
+            <div>
+                <div id="playStoreQR" class="qr-code"></div>
+                <button id="downloadPlayStoreQR" style="display: none;" onclick="downloadQRCode('playStoreQR', 'play_store_qr_code.png')">Download Play Store QR</button>
+            </div>
+        </div>
+    </div>
+    <script src="qrcode.js"></script>
+    <script>
+        function generateMainQRCode() {
+            const url = document.getElementById('urlInput').value;
+            const qrCodeElement = document.getElementById('qrCode');
+            qrCodeElement.innerHTML = ''; // ล้าง QR Code เดิม
+            if (url) {
+                new QRCode(qrCodeElement, url);
+                document.getElementById('downloadMainQR').style.display = 'block'; // แสดงปุ่มดาวน์โหลด
+            }
+        }
+        function generateStoreQRCodes() {
+            const appStoreURL = document.getElementById('appStoreInput').value;
+            const playStoreURL = document.getElementById('playStoreInput').value;
+
+            const appStoreElement = document.getElementById('appStoreQR');
+            const playStoreElement = document.getElementById('playStoreQR');
+
+            appStoreElement.innerHTML = ''; // ล้าง QR Code เดิม
+            playStoreElement.innerHTML = ''; // ล้าง QR Code เดิม
+
+            if (appStoreURL) {
+                new QRCode(appStoreElement, appStoreURL);
+                document.getElementById('downloadAppStoreQR').style.display = 'block'; // แสดงปุ่มดาวน์โหลด
+            }
+            if (playStoreURL) {
+                new QRCode(playStoreElement, playStoreURL);
+                document.getElementById('downloadPlayStoreQR').style.display = 'block'; // แสดงปุ่มดาวน์โหลด
+            }
+        }
+        function downloadQRCode(qrElementId, filename) {
+    const qrElement = document.getElementById(qrElementId).getElementsByTagName('img')[0];
+    if (qrElement) {
+        // สร้าง canvas สำหรับวาด QR Code พร้อมขอบ
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const padding = 20; // ระยะห่างระหว่าง QR Code กับขอบ
+        const qrWidth = qrElement.width;
+        const qrHeight = qrElement.height;
+        // กำหนดขนาด canvas ให้ใหญ่กว่า QR Code เพื่อเพิ่มขอบ
+        canvas.width = qrWidth + padding * 2;
+        canvas.height = qrHeight + padding * 2;
+        // วาดพื้นหลังสีขาว
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // วาด QR Code ตรงกลาง
+        ctx.drawImage(qrElement, padding, padding, qrWidth, qrHeight);
+        // แปลง canvas เป็น URL และดาวน์โหลด
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = filename;
+        link.click();
+    } else {
+        alert('QR Code ยังไม่ถูกสร้างขึ้น!');
+    }
+}
+    </script>
+</body>
+</html>
